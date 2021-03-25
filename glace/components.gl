@@ -4,19 +4,19 @@ use piston_window::*;
 pub_SceneObject := Blueprint! {
 [methods]
     render{G: Graphics} := SceneObject: self, Ref{Context}: context, 
-  		Ref{Mut * G}: graphics => Void;
-  	update := SceneObject: self, Ref{Event}: e => Void; 
+      Ref{Mut * G}: graphics => Void;
+    update := SceneObject: self, Ref{Event}: e => Void; 
 };
 
 pub_Button := Struct! {
 [data]
-  	[Int ; 4]:   pub_coords;
-  	[Float ; 4]: pub_color;
+    [Int ; 4]:   pub_coords;
+    [Float ; 4]: pub_color;
 [methods{SceneObject}]
-  	render{G: Graphics} := Button: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
+    render{G: Graphics} := Button: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
         rectangle(self.color, self.coords, context.transform, graphics);
-  	};
+    };
     update := Button: self, Ref{Event}: e => Void: {
-    	pass;  
-  	};
+        pass;
+    };
 };

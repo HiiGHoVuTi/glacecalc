@@ -5,21 +5,21 @@ use piston_window::*;
 use components::{ SceneObject, Button };
 
 main := None => Void: {
-  	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [640, 480])
-  			.exit_on_esc(true).build().unwrap();
+    PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [640, 480])
+            .exit_on_esc(true).build().unwrap();
   
     Vec{Box{Button}}: buttons = (<
         Box ( Button { coords: [0.0  , 0.0  , 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } ),
-		Box ( Button { coords: [0.0  , 150.0, 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } )
+        Box ( Button { coords: [0.0  , 200.0, 100.0, 300.0], color: [1.0, 0.0, 0.0, 1.0] } )
     >);
 
-  	while Some(event) = window.next() {
-      	window.draw_2d(Ref(event), (context, graphics, device => {
-      		clear([0.2, 0.2, 0.2, 1.0], graphics);
-          	for button in buttons.iter() {
+    while Some(event) = window.next() {
+        window.draw_2d(Ref(event), (context, graphics, device => {
+            clear([0.2, 0.2, 0.2, 1.0], graphics);
+            for button in buttons.iter() {
                 button.update(Ref(event));
-				button.render(Ref(context), graphics);
+                button.render(Ref(context), graphics);
             };
         }));
-  	};
+    };
 };

@@ -5,18 +5,18 @@ pub_SceneObject := Blueprint! {
 [methods]
     render{G: Graphics} := SceneObject: self, Ref{Context}: context, 
       Ref{Mut * G}: graphics => Void;
-    update := SceneObject: self, Ref{Event}: e => Void; 
+    update := SceneObject: self, Ref{Event}: e, Ref{Object}: extra => Void; 
 };
 
-pub_Button := Struct! {
+pub_GUIButton := Struct! {
 [data]
-    [Int ; 4]:   pub_coords;
+    [f64 ; 4]:   pub_coords;
     [Float ; 4]: pub_color;
 [methods{SceneObject}]
-    render{G: Graphics} := Button: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
+    render{G: Graphics} := GUIButton: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
         rectangle(self.color, self.coords, context.transform, graphics);
     };
-    update := Button: self, Ref{Event}: e => Void: {
+    update := GUIButton: self, Ref{Event}: e, Ref{Object}: extra => Void: {
         pass;
     };
 };

@@ -5,18 +5,32 @@ pub_SceneObject := Blueprint! {
 [methods]
     render{G: Graphics} := SceneObject: self, Ref{Context}: context, 
       Ref{Mut * G}: graphics => Void;
-    update := SceneObject: self, Ref{Event}: e, Ref{Object}: extra => Void; 
+    update := SceneObject * Mut: self, Ref{Event}: e, Ref{Object}: extra => Void; 
 };
 
 pub_GUIButton := Struct! {
 [data]
     [f64 ; 4]:   pub_coords;
     [Float ; 4]: pub_color;
+    Bool: pub_clicked;
+
 [methods{SceneObject}]
     render{G: Graphics} := GUIButton: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
         rectangle(self.color, self.coords, context.transform, graphics);
     };
-    update := GUIButton: self, Ref{Event}: e, Ref{Object}: extra => Void: {
-        pass;
+    update := GUIButton * Mut: self, Ref{Event}: e, Ref{Object}: extra => Void: {
+        clicked  := extra'(Bool: clicked);
+        mousePos := extra'(Option{[f64 ; 2]}: mousePos);
+        if mousePos.is_none() {
+            return();
+        };
+        mouse_pos := mouse_pos.unwrap();
+        if mouse_pos[0] > self.coords[0] && mouse_pos[0] < self.coords[0] + self.coords[2]
+            && mouse_pos[1] > self.coords[1] && mouse_pos[1] < self.coords[1] + self.coords[3] {
+            self.clicked <- Unbox(clicked);
+            if self.clicked {
+                self.color <- [0.0, 1.0, 0.0, 0.0];
+            };
+        };
     };
 };

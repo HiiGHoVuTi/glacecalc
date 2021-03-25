@@ -5,20 +5,20 @@ use piston_window::*;
 use components::{ SceneObject, GUIButton };
 
 main := None => Void: {
-    PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [640, 480])
-            .exit_on_esc(true).build().unwrap();
+	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [640, 480])
+			.exit_on_esc(true).build().unwrap();
   
     Vec{Box{GUIButton}}: buttons = (<
-        Box ( GUIButton { coords: [0.0  , 0.0  , 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } ),
-        Box ( GUIButton { coords: [0.0  , 200.0, 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } )
+		Box ( GUIButton { coords: [0.0  , 0.0  , 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } ),
+		Box ( GUIButton { coords: [0.0  , 200.0, 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0] } )
 	>);
 	
 	Option{[f64 ; 2]} * Mut: mousePos = None;
 	Bool * Mut: mousePressed = false;
 	Bool * Mut: click = false;
 
-    while Some(event) = window.next() {
-        window.draw_2d(Ref(event), (context, graphics, device => {
+	while Some(event) = window.next() {
+		window.draw_2d(Ref(event), (context, graphics, device => {
 		
 			#-- game logic
 			click <- false;
@@ -31,7 +31,7 @@ main := None => Void: {
 					mousePressed <- true;
 				};
 			};
-            if Some(button) = event.release_args() {
+			if Some(button) = event.release_args() {
 				if button == Button::Mouse(MouseButton::Left) {
 					if mousePressed {
 						click <- true;
@@ -60,6 +60,6 @@ main := None => Void: {
 					button.render(Ref(context), graphics);
 				};
 			};
-        }));
-    };
+		}));
+	};
 };;

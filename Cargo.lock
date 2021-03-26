@@ -4,6 +4,7 @@
 name = "HelloCalculator"
 version = "0.1.0"
 dependencies = [
+ "piston",
  "piston_window",
 ]
 

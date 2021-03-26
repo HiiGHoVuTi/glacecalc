@@ -13,6 +13,7 @@ pub_GUIButton := Struct! {
     [f64 ; 4]:   pub_coords;
     [Float ; 4]: pub_color;
     Bool: pub_clicked;
+    i8: pub_id;
 
 [methods{SceneObject}]
     render{G: Graphics} := GUIButton: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
@@ -24,13 +25,40 @@ pub_GUIButton := Struct! {
         if mousePos.is_none() {
             return();
         };
-        mouse_pos := mouse_pos.unwrap();
+        mouse_pos := mousePos.unwrap();
         if mouse_pos[0] > self.coords[0] && mouse_pos[0] < self.coords[0] + self.coords[2]
             && mouse_pos[1] > self.coords[1] && mouse_pos[1] < self.coords[1] + self.coords[3] {
             self.clicked <- Unbox(clicked);
-            if self.clicked {
-                self.color <- [0.0, 1.0, 0.0, 0.0];
-            };
         };
     };
 };
+
+pub_Calculator := Struct! {
+[data]
+
+    [Box{GUIButton} ; 2]: pub_buttons;
+    String: pub_buffer;
+
+[methods]
+
+    evaluate := Calculator: self => String: {
+        ret "".to_string;
+    };
+
+[methods{SceneObject}]
+    render{G: Graphics} := Calculator: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
+        for button in self.buttons.iter() {
+            button.render(context, graphics);
+        };
+    };
+    update := Calculator * Mut: self, Ref{Event}: e , Ref{Object}: extra => Void: {
+        for button in self.buttons.iter_mut() {
+            button.update(e, extra);
+            if button.clicked {
+                print(button.id);  
+            };
+        };
+    };
+
+};
+

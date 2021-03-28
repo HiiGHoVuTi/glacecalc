@@ -7,7 +7,7 @@ use piston_window::*;
 use components::{ SceneObject, GUIButton, Calculator };
 
 main := None => Void: {
-	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [480, 600])
+	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [460, 580])
 			.exit_on_esc(true).build().unwrap();
 
 	assets := find_folder::Search::ParentsThenKids(3, 3)
@@ -76,7 +76,7 @@ main := None => Void: {
 				main.render(Ref(context), graphics, Ref({}));
 
 
-				#-- rendering text here to avoid typing ossues
+				#-- rendering text here to avoid typing issues
 
 				text::Text::new_color([0.95, 0.9, 0.8, 1.0], 32).draw(
 					Ref(main.buffer),

@@ -1,23 +1,45 @@
 extern crate piston_window;
+extern crate find_folder;
+
 mod components;
 
 use piston_window::*;
 use components::{ SceneObject, GUIButton, Calculator };
 
 main := None => Void: {
-	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [640, 480])
+	PistonWindow * Mut: window = WindowSettings::new("Hello Calculator", [480, 600])
 			.exit_on_esc(true).build().unwrap();
+
+	assets := find_folder::Search::ParentsThenKids(3, 3)
+		.for_folder("assets").unwrap();
+
+	Glyphs * Mut: glyphs = window.load_font(assets.join("FiraSans-Black.ttf")).unwrap();
   
 	Calculator * Mut: main =
 		Calculator { 
 			buttons: [
-				Box ( GUIButton { coords: [0.0  , 0.0  , 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0], clicked: false, id: 0 } ),
-				Box ( GUIButton { coords: [0.0  , 200.0, 100.0, 100.0], color: [1.0, 0.0, 0.0, 1.0], clicked: false, id: 1 } )
+				Box ( GUIButton { coords: [360.0, 0.0  , 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "del".to_string() } ),
+				Box ( GUIButton { coords: [0.0  , 120.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "7".to_string() } ),
+				Box ( GUIButton { coords: [120.0, 120.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "8".to_string() } ),
+				Box ( GUIButton { coords: [240.0, 120.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "9".to_string() } ),
+				Box ( GUIButton { coords: [360.0, 120.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "/".to_string() } ),
+				Box ( GUIButton { coords: [0.0  , 240.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "4".to_string() } ),
+				Box ( GUIButton { coords: [120.0, 240.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "5".to_string() } ),
+				Box ( GUIButton { coords: [240.0, 240.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "6".to_string() } ),
+				Box ( GUIButton { coords: [360.0, 240.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "*".to_string() } ),
+				Box ( GUIButton { coords: [0.0  , 360.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "1".to_string() } ),
+				Box ( GUIButton { coords: [120.0, 360.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "2".to_string() } ),
+				Box ( GUIButton { coords: [240.0, 360.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "3".to_string() } ),
+				Box ( GUIButton { coords: [360.0, 360.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "-".to_string() } ),
+				Box ( GUIButton { coords: [0.0  , 480.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: ".".to_string() } ),
+				Box ( GUIButton { coords: [120.0, 480.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "0".to_string() } ),
+				Box ( GUIButton { coords: [240.0, 480.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "=".to_string() } ),
+				Box ( GUIButton { coords: [360.0, 480.0, 100.0, 100.0], color: [0.65, 0.55, 0.4, 1.0], clicked: false, id: "+".to_string() } )
 			],
 			buffer: "".to_string()
 		};
 	
-	Option{[f64 ; 2]} * Mut: mousePos = None;
+	Option{[f64 ; 2]} * Mut: mouse_pos = None;
 	Bool * Mut: click = false;
 
 	while Some(event) = window.next() {
@@ -25,7 +47,7 @@ main := None => Void: {
 		#-- game logic
 
 		if Some(pos) = event.mouse_cursor_args() {
-			mousePos <- Some(pos);
+			mouse_pos <- Some(pos);
 		};
 		if Some(button) = event.release_args() {
 			if button == Button::Mouse(MouseButton::Left) {
@@ -38,7 +60,7 @@ main := None => Void: {
 			extra := {
 				dt <- args.dt,
 				clicked <- click,
-				mousePos <- mousePos,
+				mouse_pos <- mouse_pos,
 			};
 
 			click <- false;
@@ -49,10 +71,33 @@ main := None => Void: {
 		if Some(_args) = event.render_args() {
 
 			window.draw_2d(Ref(event), (context, graphics, device => {
+				clear([0.45, 0.4, 0.3, 1.0], graphics);
 
-				clear([0.2, 0.2, 0.2, 1.0], graphics);
+				main.render(Ref(context), graphics, Ref({}));
 
-				main.render(Ref(context), graphics);
+
+				#-- rendering text here to avoid typing ossues
+
+				text::Text::new_color([0.95, 0.9, 0.8, 1.0], 32).draw(
+					Ref(main.buffer),
+					MutRef(glyphs),
+					Ref(context.draw_state),
+					context.transform.trans(20.0, 52.0), graphics
+				).unwrap();
+
+				for button in main.buttons.iter() {
+					text::Text::new_color([0.95, 0.9, 0.8, 1.0], 32).draw(
+						Ref(button.id),
+						MutRef(glyphs),
+						Ref(context.draw_state),
+						context.transform.trans(
+							button.coords[0] + button.coords[2] / 2.0 - 8.0 * (button.id.len() as f64),
+							button.coords[1] + button.coords[3] / 2.0
+						), graphics
+					).unwrap();
+				};
+
+				glyphs.factory.encoder.flush(device);
 			}));
 
 		};

@@ -4,7 +4,8 @@
 name = "HelloCalculator"
 version = "0.1.0"
 dependencies = [
- "piston",
+ "evalexpr",
+ "find_folder",
  "piston_window",
 ]
 
@@ -401,6 +402,18 @@ name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
+
+[[package]]
+name = "evalexpr"
+version = "5.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a8619223d40c23279f9120e2646712ec3eeeb68b546ed993c619d77682bdef8"
+
+[[package]]
+name = "find_folder"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f6d018fb95a0b59f854aed68ecd96ce2b80af7911b92b1fed3c4b1fa516b91b"
 
 [[package]]
 name = "fnv"

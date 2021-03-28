@@ -1,10 +1,13 @@
 extern crate piston_window;
+extern crate evalexpr;
+
 use piston_window::*;
+use evalexpr::eval;
 
 pub_SceneObject := Blueprint! {
 [methods]
     render{G: Graphics} := SceneObject: self, Ref{Context}: context, 
-      Ref{Mut * G}: graphics => Void;
+      Ref{Mut * G}: graphics, Ref{Object}: extra => Void;
     update := SceneObject * Mut: self, Ref{Event}: e, Ref{Object}: extra => Void; 
 };
 
@@ -13,21 +16,19 @@ pub_GUIButton := Struct! {
     [f64 ; 4]:   pub_coords;
     [Float ; 4]: pub_color;
     Bool: pub_clicked;
-    i8: pub_id;
+    String: pub_id;
 
 [methods{SceneObject}]
-    render{G: Graphics} := GUIButton: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
+    render{G: Graphics} := GUIButton: self, Ref{Context}: context, Ref{Mut * G}: graphics, Ref{Object}: extra => Void: {
         rectangle(self.color, self.coords, context.transform, graphics);
     };
-    update := GUIButton * Mut: self, Ref{Event}: e, Ref{Object}: extra => Void: {
-        clicked  := extra'(Bool: clicked);
-        mousePos := extra'(Option{[f64 ; 2]}: mousePos);
-        if mousePos.is_none() {
+    update := GUIButton * Mut: self, Ref{Event}: e, { Bool: clicked, Option{[f64 ; 2]}: mouse_pos } => Void: {
+        if mouse_pos.is_none() {
             return();
         };
-        mouse_pos := mousePos.unwrap();
-        if mouse_pos[0] > self.coords[0] && mouse_pos[0] < self.coords[0] + self.coords[2]
-            && mouse_pos[1] > self.coords[1] && mouse_pos[1] < self.coords[1] + self.coords[3] {
+        actual_pos := mouse_pos.unwrap();
+        if actual_pos[0] > self.coords[0] && actual_pos[0] < self.coords[0] + self.coords[2]
+            && actual_pos[1] > self.coords[1] && actual_pos[1] < self.coords[1] + self.coords[3] {
             self.clicked <- Unbox(clicked);
         };
     };
@@ -36,27 +37,42 @@ pub_GUIButton := Struct! {
 pub_Calculator := Struct! {
 [data]
 
-    [Box{GUIButton} ; 2]: pub_buttons;
+    [Box{GUIButton} ; 17]: pub_buttons;
     String: pub_buffer;
 
 [methods]
 
     evaluate := Calculator: self => String: {
-        ret "".to_string;
+        res := eval(Ref(self.buffer));
+        if Ok(val) = res {
+            return val.to_string();
+        }
+        ret "Error".to_string();
     };
 
 [methods{SceneObject}]
-    render{G: Graphics} := Calculator: self, Ref{Context}: context, Ref{Mut * G}: graphics => Void: {
+    render{G: Graphics} := Calculator: self, Ref{Context}: context, Ref{Mut * G}: graphics, Ref{Object}: extra => Void: {
         for button in self.buttons.iter() {
-            button.render(context, graphics);
+            button.render(context, graphics, Ref({  }));
         };
     };
-    update := Calculator * Mut: self, Ref{Event}: e , Ref{Object}: extra => Void: {
+    update := Calculator * Mut: self, Ref{Event}: e, Ref{Object}: extra => Void: {
+        Bool * Mut: will_update = false;
         for button in self.buttons.iter_mut() {
             button.update(e, extra);
             if button.clicked {
-                print(button.id);  
+                if button.id == "=".to_string() {
+                    will_update <- true;
+                } else if button.id == "del".to_string() {
+                    self.buffer.pop();
+                } else {
+                    self.buffer.push_str(Ref(button.id.to_string()));
+                };
+                print(self.buffer);
             };
+        };
+        if will_update {
+            self.buffer <- self.evaluate();
         };
     };
 
